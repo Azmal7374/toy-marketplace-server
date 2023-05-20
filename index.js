@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+require("dotenv").config();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
 const port = process.env.PORT || 5000;
@@ -7,8 +8,7 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-const uri =
-  "mongodb+srv://toymarketplace:W34IZnjLpBhHkGrh@cluster0.wlub5y3.mongodb.net/?retryWrites=true&w=majority";
+const uri =`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.wlub5y3.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -22,7 +22,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+     client.connect();
 
     const db = client.db("Toymarketplace");
     const toyCollection = db.collection("toys");
@@ -95,6 +95,22 @@ async function run() {
         })
         .toArray();
       res.send(toys);
+    });
+
+    app.put("/updateToy/:id", async (req, res) => {
+      const id = req.params.id;
+      const body = req.body;
+      console.log(body);
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          price: body.price,
+          quatntiy: body.quatntiy,
+          description: body.description,
+        },
+      };
+      const result = await toyCollection.updateOne(filter, updateDoc);
+      res.send(result);
     });
 
     // Send a ping to confirm a successful connection
