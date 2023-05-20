@@ -97,8 +97,9 @@ async function run() {
       res.send(toys);
     });
 
-    app.put("/updateToy/:id", async (req, res) => {
+    app.put("/updateToys/:id", async (req, res) => {
       const id = req.params.id;
+      const options = {upset: true};
       const body = req.body;
       console.log(body);
       const filter = { _id: new ObjectId(id) };
@@ -107,9 +108,10 @@ async function run() {
           price: body.price,
           quatntiy: body.quatntiy,
           description: body.description,
+          subCategory: body.subCategory,
         },
       };
-      const result = await toyCollection.updateOne(filter, updateDoc);
+      const result = await toyCollection.updateOne(filter, updateDoc, options);
       res.send(result);
     });
 
